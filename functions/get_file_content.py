@@ -1,6 +1,24 @@
 import os
 from config import *
 
+schema_get_file_content = {
+    "type": "function",
+    "function": {
+        "name": "get_file_content",
+        "description": f"Reads content from a specified file relative to working directory, function returns string, with file contents in plain text. If file is larger than {MAX_CHARS} characters, the file will be trunctated to lenght of {MAX_CHARS} characters.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to file from whom we read file content, relative to the working directory",
+                },
+            },
+            "required": ["file_path"],
+        },
+    },
+}
+
 def get_file_content(working_directory: str, file_path: str) -> str:
     working_dir_absolute = os.path.abspath(working_directory)
     target_file = os.path.normpath(os.path.join(working_dir_absolute, file_path))

@@ -1,9 +1,11 @@
 import os
 import argparse
+import json
 from dotenv import load_dotenv
 from openai import OpenAI
 
 from prompts import system_prompt
+from call_function import available_functions, call_function
 
 def main():
     parser = argparse.ArgumentParser(prog="AI Chatbot", description="AI chatbot for bootdev")
@@ -31,7 +33,7 @@ def main():
     response = client.chat.completions.create(
         model="openrouter/free",
         messages=messages,
-        temperature=0,
+        tools=available_functions,
     )
 
     if response.usage is None:
@@ -42,7 +44,19 @@ def main():
         print(f"Prompt tokens: {response.usage.completion_tokens}")
         print(f"Response tokens: {response.usage.prompt_tokens}")
 
-    print(response.choices[0].message.content)
+    message = response.choices[0].message
+
+    if message.tool_calls is not None:
+        for tool_call in message.tool_calls:
+            result_message = call_function(tool_call, args.verbose)
+
+            if result_message["content"] == "":
+                raise Exception("Content from tool result can't be empty")
+
+            if args.verbose:
+                print(f"-> {result_message['content']}")
+    else:
+        print(message)
 
 if __name__ == "__main__":
     main()
