@@ -5,16 +5,22 @@ schema_get_file_content = {
     "type": "function",
     "function": {
         "name": "get_file_content",
-        "description": f"Reads content from a specified file relative to working directory, function returns string, with file contents in plain text. If file is larger than {MAX_CHARS} characters, the file will be trunctated to lenght of {MAX_CHARS} characters.",
+        "strict": True,
+        "description": (
+            "Reads a file and returns its contents as plain text. Use it to inspect code before "
+            f"modifying it. Output is truncated to {MAX_CHARS} characters for larger files. "
+            "Takes only 'file_path'. It does not run or modify the file."
+        ),
         "parameters": {
             "type": "object",
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "Path to file from whom we read file content, relative to the working directory",
+                    "description": "Path of the file to read, relative to the working directory (e.g. 'main.py').",
                 },
             },
             "required": ["file_path"],
+            "additionalProperties": False,
         },
     },
 }

@@ -5,23 +5,32 @@ schema_run_python_file = {
     "type": "function",
     "function": {
         "name": "run_python_file",
-        "description": "Run a python script in a specified path with optional arguments. Function returns return code if it is non zero, stdout and/or stderr",
+        "strict": True,
+        "description": (
+            "Executes an EXISTING Python (.py) file that is already on disk and returns its "
+            "exit code (only if non-zero), stdout and stderr. "
+            "Takes ONLY 'file_path' and 'args'. It does NOT accept file content or code. "
+            "To create or modify a script, call write_file first, then call run_python_file "
+            "with just the path."
+        ),
         "parameters": {
             "type": "object",
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "Path to python script which we want to run",
+                    "description": "Path to the .py file to execute, relative to the working directory (e.g. 'main.py').",
                 },
                 "args": {
                     "type": ["array", "null"],
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Optional list of strings which will be passed as CLI arguments (default is None)",
+                    "items": {"type": "string"},
+                    "description": (
+                        "List of command-line arguments, each as a string (e.g. [\"3 + 7 * 2\"]). "
+                        "Pass null if the script needs no arguments."
+                    ),
                 },
             },
-            "required": ["file_path"],
+            "required": ["file_path", "args"],
+            "additionalProperties": False,
         },
     },
 }

@@ -4,15 +4,21 @@ schema_get_files_info = {
     "type": "function",
     "function": {
         "name": "get_files_info",
-        "description": "Lists files in a specified directory relative to the working directory, providing file size and directory status",
+        "strict": True,
+        "description": (
+            "Lists the entries of a directory with each entry's size in bytes and whether it is a "
+            "directory. Use this to discover which files exist. Takes only 'directory'."
+        ),
         "parameters": {
             "type": "object",
             "properties": {
                 "directory": {
                     "type": "string",
-                    "description": "Directory path to list files from, relative to the working directory (default is the working directory itself)",
+                    "description": "Directory to list, relative to the working directory. Use '.' for the working directory itself.",
                 },
             },
+            "required": ["directory"],
+            "additionalProperties": False,
         },
     },
 }

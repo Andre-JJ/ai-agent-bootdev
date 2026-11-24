@@ -4,20 +4,27 @@ schema_write_file = {
     "type": "function",
     "function": {
         "name": "write_file",
-        "description": "Writes specified text content to a specified file whose file path is relative to working directory",
+        "strict": True,
+        "description": (
+            "Creates or completely overwrites a file with the given text. Parent directories are "
+            "created if missing. This only writes; it does NOT run anything. To execute a Python "
+            "file afterwards, call run_python_file with the path. Always pass the FULL new file "
+            "contents, not a diff or snippet."
+        ),
         "parameters": {
             "type": "object",
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "Path to file to which we write content to",
+                    "description": "Path of the file to write, relative to the working directory (e.g. 'calculator/pkg/calculator.py').",
                 },
                 "content": {
                     "type": "string",
-                    "description": "Content in form of text which needs to be written into file",
+                    "description": "The complete text the file should contain after writing.",
                 },
             },
             "required": ["file_path", "content"],
+            "additionalProperties": False,
         },
     },
 }
