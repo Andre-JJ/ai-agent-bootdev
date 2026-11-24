@@ -29,34 +29,41 @@ def main():
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": args.user_prompt},
     ]
+    for _ in range(20):
+        response = client.chat.completions.create(
+            model="openrouter/free",
+            messages=messages,
+            tools=available_functions,
+        )
 
-    response = client.chat.completions.create(
-        model="openrouter/free",
-        messages=messages,
-        tools=available_functions,
-    )
+        if response.usage is None:
+            raise RuntimeError("API call failed")
 
-    if response.usage is None:
-        raise RuntimeError("API call failed")
+        if args.verbose:
+            print(f"User prompt: {args.user_prompt}")
+            print(f"Prompt tokens: {response.usage.completion_tokens}")
+            print(f"Response tokens: {response.usage.prompt_tokens}")
 
-    if args.verbose:
-        print(f"User prompt: {args.user_prompt}")
-        print(f"Prompt tokens: {response.usage.completion_tokens}")
-        print(f"Response tokens: {response.usage.prompt_tokens}")
+        message = response.choices[0].message
+        messages.append(message)
 
-    message = response.choices[0].message
+        if message.tool_calls is not None:
+            for tool_call in message.tool_calls:
+                result_message = call_function(tool_call, args.verbose)
+                messages.append(result_message)
 
-    if message.tool_calls is not None:
-        for tool_call in message.tool_calls:
-            result_message = call_function(tool_call, args.verbose)
+                if result_message["content"] == "":
+                    raise Exception("Content from tool result can't be empty")
 
-            if result_message["content"] == "":
-                raise Exception("Content from tool result can't be empty")
-
-            if args.verbose:
-                print(f"-> {result_message['content']}")
+                if args.verbose:
+                    print(f"-> {result_message['content']}")
+        else:
+            print("Final response:")
+            print(message.content)
+            break
     else:
-        print(message)
+        print("Maximum number of iterations is reached")
+        exit(1)
 
 if __name__ == "__main__":
     main()
